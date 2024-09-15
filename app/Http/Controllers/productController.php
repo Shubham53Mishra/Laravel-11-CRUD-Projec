@@ -3,30 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator; // added semicolon
 
-class productController extends Controller
+class ProductController extends Controller
 {
-    //This  method will show products page
+    // This method will show products page
     public function index() {
 
     }
-    // this method will show  create product page
+
+    // This method will show create product page
     public function create() {
-
+        return view('products.create');
     }
-    // this  method will store a products in db
-    public function store() {
 
+    // This method will store a product in the database
+    public function store(Request $request) {
+        $rules = [
+            'name' => 'required|min:5',
+            'sku' => 'required|min:3',
+            'price' => 'required|numeric',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return back()->withInput()->withErrors($validator);
+        }
+        // Add code to store the product in the database
     }
-  //  this method will show  edit product page
+
+    // This method will show edit product page
     public function edit() {
 
     }
-    //  this method will update a product
+
+    // This method will update a product
     public function update() {
 
     }
-    //  this method will  delete a product
+
+    // This method will delete a product
     public function destroy() {
 
     }
