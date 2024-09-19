@@ -28,9 +28,16 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
+            return redirect()->route('products.create')->withErrors($validator)->withInput();
+
+           
         }
         // Add code to store the product in the database
+        $product = new product();
+        $product->name = $request->name;
+        $product->sku = $request->sku;
+        $product->price = $request->price;
+        $product->save();
     }
 
     // This method will show edit product page

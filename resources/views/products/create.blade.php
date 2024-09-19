@@ -13,7 +13,7 @@
       <div class="container">
       <div class="row d-flex justify-content-center">
         <div class="col-md-10">
-          <div class="card border-0 shadow-lg  my-4">
+          <div class="card border-0 shadow-lg my-4">
             <div class="card-header bg-dark">
               <h3 class="text-white">Create Product</h3>
             </div>
@@ -22,29 +22,32 @@
              <div class="card-body">
                 <div class="mb-3">
                   <label for="name" class="form-label h5">Name</label>
-                  <input type="text" class="  @error('name') is-invalid @enderror form-control form-control-lg" placeholder="Name" name="name" id="name">
+                  <input value="{{ old('name') }}" type="text" class=" @error('name') is-invalid @enderror form-control form-control-lg" placeholder="Name" name="name" id="name">
                   @error('name')
-                  <p class="invalid-feedback">{{$message}}</p>
+                  <p class="invalid-feedback">{{ $message }}</p>
                   @enderror
                 </div>
                 <div class="mb-3">
                   <label for="sku" class="form-label h5">SKU</label>
-                  <input type="text" class="  @error('sku') is-invalid @enderror form-control form-control-lg" placeholder="SKU" name="sku" id="sku">
+                  <input value="{{ old('sku') }}" type="text" class=" @error('sku') is-invalid @enderror form-control form-control-lg" placeholder="SKU" name="sku" id="sku">
                   @error('sku')
-                  <p class="invalid-feedback">{{$message}}</p>
+                  <p class="invalid-feedback">{{ $message }}</p>
                   @enderror
                 </div>
                 <div class="mb-3">
                   <label for="price" class="form-label h5">Price</label>
-                  <input type="number" class="form-control form-control-lg" placeholder="Price" name="price" id="price">
+                  <input value="{{ old('price') }}" type="number" class="@error('price') is-invalid @enderror form-control form-control-lg" placeholder="Price" name="price" id="price">
+                  @error('price')
+                  <p class="invalid-feedback">{{ $message }}</p>
+                  @enderror
                 </div>
                 <div class="mb-3">
                   <label for="description" class="form-label h5">Description</label>
-                   <textarea  placeholder="Description"class="form-control" name="description" cols="30" rows="5" id="description"></textarea>
+                  <textarea placeholder="Description" class="form-control" name="description" cols="30" rows="5" id="description">{{ old('description') }}</textarea>
                 </div>
                 <div class="mb-3">
                   <label for="image" class="form-label h5">Image</label>
-                  <input type="file" class="form-control form-control-lg" placeholder="image" name="image" id="imahe">
+                  <input value="{{ old('image') }}" type="file" class="form-control form-control-lg" name="image" id="image">
                 </div>
                 <div class="d-grid">
                   <button type="submit" class="btn btn-lg btn-primary">Create Product</button>
