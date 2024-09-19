@@ -3,55 +3,119 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator; // added semicolon
+use App\Models\Product;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    // This method will show products page
     public function index() {
-
+        $products = Product::all();
+        return view('products.list', compact('products'));
     }
 
-    // This method will show create product page
     public function create() {
         return view('products.create');
     }
 
-    // This method will store a product in the database
     public function store(Request $request) {
+        // Validation rules
         $rules = [
             'name' => 'required|min:5',
             'sku' => 'required|min:3',
             'price' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validate image file
         ];
 
+        // Validate input
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return redirect()->route('products.create')->withErrors($validator)->withInput();
-
-           
+            return redirect()->route('products.create')
+                ->withErrors($validator)
+                ->withInput();
         }
-        // Add code to store the product in the database
-        $product = new product();
+
+        // Store product details
+        $product = new Product();
         $product->name = $request->name;
         $product->sku = $request->sku;
         $product->price = $request->price;
+        $product->description = $request->description;
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $ext = $image->getClientOriginalExtension();
+            $imageName = time() . '.' . $ext;
+
+            // Move the image to the 'uploads/products' directory
+            $image->move(public_path('uploads/products'), $imageName);
+
+            // Store the image name in the database
+            $product->image = $imageName;
+        }
+
+        // Save product
         $product->save();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product added successfully.');
     }
 
-    // This method will show edit product page
-    public function edit() {
-
+    public function edit($id) {
+        $product = Product::findOrFail($id);
+        return view('products.edit', compact('product'));
     }
 
-    // This method will update a product
-    public function update() {
+    public function update(Request $request, $id) {
+        // Validation rules
+        $rules = [
+            'name' => 'required|min:5',
+            'sku' => 'required|min:3',
+            'price' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validate image file
+        ];
 
+        // Validate input
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->route('products.edit', $id)
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Find and update the product
+        $product = Product::findOrFail($id);
+        $product->name = $request->name;
+        $product->sku = $request->sku;
+        $product->price = $request->price;
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $ext = $image->getClientOriginalExtension();
+            $imageName = time() . '.' . $ext;
+
+            // Move the image to the 'uploads/products' directory
+            $image->move(public_path('uploads/products'), $imageName);
+
+            // Store the image name in the database
+            $product->image = $imageName;
+        }
+
+        // Save changes
+        $product->save();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product updated successfully.');
     }
 
-    // This method will delete a product
-    public function destroy() {
+    public function destroy($id) {
+        $product = Product::findOrFail($id);
+        $product->delete();
 
+        return redirect()->route('products.index')
+            ->with('success', 'Product deleted successfully.');
     }
 }
