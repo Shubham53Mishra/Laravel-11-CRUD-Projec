@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -14,8 +15,7 @@ class ProductController extends Controller
             'products' => $products
         ]);
     }
-    
-    
+
     public function create() {
         return view('products.create');
     }
@@ -93,17 +93,23 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->sku = $request->sku;
         $product->price = $request->price;
+        $product->description = $request->description;
 
         // Handle image upload
         if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($product->image && File::exists(public_path('uploads/products/'.$product->image))) {
+                File::delete(public_path('uploads/products/'.$product->image));
+            }
+
             $image = $request->file('image');
             $ext = $image->getClientOriginalExtension();
             $imageName = time() . '.' . $ext;
 
-            // Move the image to the 'uploads/products' directory
+            // Move the new image to the 'uploads/products' directory
             $image->move(public_path('uploads/products'), $imageName);
 
-            // Store the image name in the database
+            // Store the new image name in the database
             $product->image = $imageName;
         }
 
@@ -116,6 +122,13 @@ class ProductController extends Controller
 
     public function destroy($id) {
         $product = Product::findOrFail($id);
+
+        // Delete the image if it exists
+        if ($product->image && File::exists(public_path('uploads/products/'.$product->image))) {
+            File::delete(public_path('uploads/products/'.$product->image));
+        }
+
+        // Delete the product
         $product->delete();
 
         return redirect()->route('products.index')
