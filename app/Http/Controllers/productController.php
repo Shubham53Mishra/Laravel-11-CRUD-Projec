@@ -9,10 +9,13 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     public function index() {
-        $products = Product::all();
-        return view('products.list', compact('products'));
+        $products = Product::orderBy('created_at', 'DESC')->get();
+        return view('products.list', [
+            'products' => $products
+        ]);
     }
-
+    
+    
     public function create() {
         return view('products.create');
     }
